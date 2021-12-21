@@ -1,0 +1,2 @@
+C:/Users/Legion/Desktop/Storage/Uni/3ano/CG/Testes/Projeto/Project/Project/include/glm/out/build/x64-Debug/CMakeFiles/edit_cache.dir
+C:/Users/Legion/Desktop/Storage/Uni/3ano/CG/Testes/Projeto/Project/Project/include/glm/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
