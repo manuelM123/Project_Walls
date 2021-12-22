@@ -9,6 +9,8 @@
 #include <camera.h>
 #include <iostream>
 
+//nota => ver camera position com cube position
+
 // New file
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -17,7 +19,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
-void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model);
+void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int floorVAO, unsigned int diffuseMap);
+unsigned int loadTexture(char const* path);
 glm::mat4 resetModel(glm::mat4 model);
 
 // settings
@@ -38,10 +41,23 @@ float lastFrame = 0.0f;
 glm::vec3 lightPos(0.0f, 3.0f, 0.0f);
 //glm::vec3 lightPos(1.0f, 0.0f, 0.0f);
 
+//variables for colision
+float xstep = 0.01f;
+float ystep = 0.01f;
+float zstep = 0.01f;
+
+int stop = 0;
+double dArray[16] = { 0.0 };
+unsigned int diffusemap;
 
 void drawCubes(unsigned int cubeVAO) {
     glBindVertexArray(cubeVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+void drawFloor(unsigned int floorVAO) {
+    glBindVertexArray(floorVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 float ang = 0.01;
@@ -96,7 +112,6 @@ int main()
     Shader lightingShader("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\2.1.basic_lighting.vs", "C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\2.1.basic_lighting.fs");
     Shader lampShader("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\2.1.lamp.vs", "C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\2.1.lamp.fs");
     
-    
     //Shader ourShader("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\VS.vs", "C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\FS.fs");
     
     
@@ -104,8 +119,8 @@ int main()
     // ------------------------------------------------------------------
     float vertices[] = {
         
-        //lados restantes
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+        //lados restantes     //colors           
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  
         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -126,7 +141,7 @@ int main()
         -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
         -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
         
-        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 
         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
@@ -142,7 +157,7 @@ int main()
         -0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,
         -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,
  
-        //topo 
+        //topo                //colors
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
@@ -198,6 +213,17 @@ int main()
         -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
     };
+
+    float floor[] = {
+        -0.5f, -0.5f, -0.5f,    0.5f, 1.0f,  0.5f,  //0.0f, 0.0f, //bottom left
+        0.5f, -0.5f, -0.5f,     0.5f, 1.0f,  0.5f,  //1.0f, 0.0f, //bottom right
+        0.5f, -0.5f,  0.5f,     0.5f, 1.0f,  0.5f,  //1.0f, 0.0f, //bottom right
+
+        0.5f, -0.5f,  0.5f,     0.5f, 1.0f,  0.5f,  //0.0f, 0.0f, //bottom left
+        -0.5f, -0.5f,  0.5f,    0.5f, 1.0f,  0.5f,  //0.0f, 0.0f, //bottom left
+        -0.5f, -0.5f, -0.5f,    0.5f, 1.0f,  0.5f,  //1.0f, 1.0f //top right
+    };
+
     // first, configure the cube's VAO (and VBO)
     unsigned int VBO, cubeVAO, VAO;
     //glGenVertexArrays(1, &cubeVAO);
@@ -216,7 +242,6 @@ int main()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
     
-    
     // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
     unsigned int lightVAO;
     glGenVertexArrays(1, &lightVAO);
@@ -231,26 +256,54 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    // third, configure the floor's VAO (and VBO)
+    unsigned int VBO1, floorVAO;
+    glGenVertexArrays(1, &floorVAO);
+    glGenBuffers(1, &VBO1);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO1);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(floor), floor, GL_STATIC_DRAW);
+
+    glBindVertexArray(floorVAO);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // normal attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    // texture coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    diffusemap = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\wall.jpg");
+
+    //---------------------------------------------------------------------------------------------------
+
     //Create and load a texture
-    /*unsigned int textID;
-    glGenBuffers(1, &textID);
+    /*unsigned int texture1;
+    glGenTextures(1, &texture1);
 
     //Set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);    // set texture wrapping to GL_REPEAT (default wrapping method)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTextureParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTextureParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTextureParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTextureParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
+    glBindTexture(GL_TEXTURE_CUBE_MAP, texture1);
     //load image, create the texture and generate mipmaps
     int width, height, nrChannels;
     unsigned char* data = stbi_load("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\wall.jpg", &width, &height, &nrChannels, 0);
     
     if (data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
     }
     else
     {
@@ -259,7 +312,8 @@ int main()
     stbi_image_free(data);
 
     ourShader.use();
-    glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0);*/
+    glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0);
+    */
 
     // render loop
     // -----------
@@ -279,10 +333,6 @@ int main()
         // ------
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // bind textures on corresponding texture units
-        /*glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, textID);*/
         
         // be sure to activate shader when setting uniforms/drawing objects
         lightingShader.use();
@@ -301,6 +351,7 @@ int main()
         glm::mat4 model = glm::mat4(1.0f);
         //model = glm::rotate(model, ang, glm::vec3(0, 1, 0));
         //model = glm::rotate(model, ang, glm::vec3(0, 1, 0));
+
         //atualização da matrix model => lamp
         lightingShader.setMat4("model", model);
         
@@ -308,9 +359,13 @@ int main()
         /*glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);*/
         //drawCubes(cubeVAO);
+
+        // bind textures on corresponding texture units
+        /*glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, texture1);*/
         
-        //ourShader.use();
-        goMaze(cubeVAO,lightingShader,model);
+        //drawing maze
+        goMaze(cubeVAO, lightingShader, model, floorVAO, diffusemap);
 
         // also draw the lamp object
         lampShader.use();
@@ -323,6 +378,8 @@ int main()
         
         glBindVertexArray(lightVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        //ourShader.use();
         
         
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -353,14 +410,27 @@ void processInput(GLFWwindow *window)
     
     //if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && yMax >= 105) ==> limite eixo y a usar quando jogador estiver bem posicionado
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS and camera.Position.y <= 3.0f and camera.Position.y >= -0.3f)
         camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS and camera.Position.y <= 3.0f and camera.Position.y >= -0.3f)
         camera.ProcessKeyboard(BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
+
+    if (camera.Position.y > 3.0f)
+        camera.Position.y = 3.0f;
+
+    if (camera.Position.y < -0.3f)
+        camera.Position.y = -0.3f;
+    
+    //teste => para usar depois em colisões
+    if (glfwGetKey(window, GLFW_KEY_END) == GLFW_PRESS) {
+        std::cout << "Camera X coordinates: " << camera.Position.x;
+        std::cout << "Camera Y coordinates: " << camera.Position.y;
+        std::cout << "Camera Z coordinates: " << camera.Position.z;
+    }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -393,8 +463,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     lastY = ypos;
     
     camera.ProcessMouseMovement(xoffset, yoffset);
-    std::cout << "Mouse coordinates: " << xpos << ", " << ypos << std::endl;
-
+    //std::cout << "Mouse coordinates: " << xpos << ", " << ypos << std::endl;
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
@@ -410,50 +479,107 @@ glm::mat4 resetModel(glm::mat4 model) {
     return initial_model;
 }
 
-void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model) {
+void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int floorVAO, unsigned int diffuseMap) {
     int i;
     int j;
 
-    int maze[5][5] = {
-        {1,1,0,0,1},
-        {1,1,1,0,0},
-        {0,0,0,1,0},
-        {1,1,0,0,0},
-        {1,1,0,1,1}
+    int maze[5][6] = {
+        {1,1,0,0,1,1},
+        {1,1,1,0,0,1},
+        {1,0,0,1,0,1},
+        {1,1,0,0,0,1},
+        {1,1,0,1,1,1}
     };
 
     //inital_model corresponds to the point of origin
     glm::mat4 initial_model;
     initial_model = model;
 
-    /*int maze[2][5] = {
-        {1,1,0,0,1},
-        {1,1,1,0,0}
-    }; */
-
     for (i = 0; i < 5; i++) {
         int pos = 0;
-        //model = resetModel(initial_model);
-        for (j = 4; j >= 0; j--) {
+        for (j = 5; j >= 0; j--) {
             model = resetModel(initial_model);
-            pos = 4 - j;
-            if (maze[i][j] == 1) {  // Means there is 
-                //if (i == 0) {
-                    model = glm::translate(model, glm::vec3(i, 0, pos));
-                    Light.setMat4("model", model);
-                    drawCubes(cubeVAO);
-                //}
-                /*if (i == 1) {
-                    model = glm::translate(initial_model, glm::vec3(i, 0, j));
-                    Light.setMat4("model", model);
-                    drawCubes(cubeVAO);
-                }*/
-
-                    //OLAA
-
+            pos = 5 - j;
+            if (maze[i][j] == 1) {  // Means there is a cube 
+                model = glm::translate(model, glm::vec3(i, 0, pos));
+                //pegar no modelo de ponto de origem e somar os valores x e z da translação => para obter as coordenadas de cada objeto no mundo
+                //nota: pôr num array de posições 
+                Light.setMat4("model", model);
+                drawCubes(cubeVAO);
             }
+
+            else {
+                model = glm::translate(model, glm::vec3(i, 0, pos));
+                Light.setMat4("model", model);
+                // carrega a textura para os shaders
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, diffuseMap);
+                drawFloor(floorVAO);
+            }
+
+            /*double dArray[16] = {0.0};
+
+            const float* pSource = (const float*)glm::value_ptr(model);
+            for (int i = 0; i < 16; ++i)
+                dArray[i] = pSource[i];
+
+            for (int t = 0; t < 16; t++) {
+                if (camera.Position.x == dArray[t] || camera.Position.z == dArray[t])
+                    std::cout << "IGUAL ";
+            }*/
+
+            /*if (stop == 0) {
+                    const float* pSource = (const float*)glm::value_ptr(model);
+                    for (int i = 0; i < 16; ++i)
+                        dArray[i] = pSource[i];
+
+                    for (int t = 0; t < 16; t++) {
+                        std::cout << "Number t: " << dArray[t] << "\n";
+                    }
+                    std::cout << "|||||||" << "\n";
+                }
+                stop++;*/
         }
     }
+}
+
+// utility function for loading a 2D texture from file
+// ---------------------------------------------------
+unsigned int loadTexture(char const* path)
+{
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+
+    int width, height, nrComponents;
+    unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
+    if (data)
+    {
+        GLenum format;
+        if (nrComponents == 1)
+            format = GL_RED;
+        else if (nrComponents == 3)
+            format = GL_RGB;
+        else if (nrComponents == 4)
+            format = GL_RGBA;
+
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Texture failed to load at path: " << path << std::endl;
+        stbi_image_free(data);
+    }
+
+    return textureID;
 }
 
 
