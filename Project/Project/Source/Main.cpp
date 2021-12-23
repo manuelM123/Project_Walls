@@ -19,7 +19,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
-void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int floorVAO, unsigned int diffuseMap);
+void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int floorVAO);
 unsigned int loadTexture(char const* path);
 glm::mat4 resetModel(glm::mat4 model);
 
@@ -48,7 +48,6 @@ float zstep = 0.01f;
 
 int stop = 0;
 double dArray[16] = { 0.0 };
-unsigned int diffusemap;
 
 void drawCubes(unsigned int cubeVAO) {
     glBindVertexArray(cubeVAO);
@@ -119,51 +118,51 @@ int main()
     // ------------------------------------------------------------------
     float vertices[] = {
         
-        //lados restantes     //colors           
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  
-        0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+        //lados restantes     //normals            //texture coords
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,   1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,   1.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,   1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
         
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-        0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-        0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-        0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,   1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,   1.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,   1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
         
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
         
-        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 
-        0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-        0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-        0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,   0.0f,  0.0f,
+        0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,   1.0f,  0.0f,
+        0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,   1.0f,  1.0f,
+        0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,   1.0f,  1.0f,
+        0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,   0.0f,  1.0f,
+        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,   0.0f,  0.0f,
         
-        //floor of the labirint //vertice ==> cor
-        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,
-        0.5f, -0.5f, -0.5f,     0.0f, -1.0f,  0.0f,
-        0.5f, -0.5f,  0.5f,     0.0f, -1.0f,  0.0f,
+        //floor of the labirint //normals     //texture coords
+        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+        0.5f, -0.5f, -0.5f,     0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+        0.5f, -0.5f,  0.5f,     0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
 
-        0.5f, -0.5f,  0.5f,     0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,
+        0.5f, -0.5f,  0.5f,     0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+        -0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
  
-        //topo                //colors
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-        0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+        //topo                //normals            //texture coords
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+        0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,   1.0f,  0.0f,
+        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,   1.0f,  1.0f,
+        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,   1.0f,  1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f
     };
 
     float verticesLamp[] = {
@@ -215,13 +214,13 @@ int main()
     };
 
     float floor[] = {
-        -0.5f, -0.5f, -0.5f,    0.5f, 1.0f,  0.5f,  //0.0f, 0.0f, //bottom left
-        0.5f, -0.5f, -0.5f,     0.5f, 1.0f,  0.5f,  //1.0f, 0.0f, //bottom right
-        0.5f, -0.5f,  0.5f,     0.5f, 1.0f,  0.5f,  //1.0f, 0.0f, //bottom right
+        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,  0.0f, 0.0f, //bottom left
+        0.5f, -0.5f, -0.5f,     0.0f, -1.0f,  0.0f,  1.0f, 0.0f, //bottom right
+        0.5f, -0.5f,  0.5f,     0.0f, -1.0f,  0.0f,  1.0f, 1.0f, //top right
 
-        0.5f, -0.5f,  0.5f,     0.5f, 1.0f,  0.5f,  //0.0f, 0.0f, //bottom left
-        -0.5f, -0.5f,  0.5f,    0.5f, 1.0f,  0.5f,  //0.0f, 0.0f, //bottom left
-        -0.5f, -0.5f, -0.5f,    0.5f, 1.0f,  0.5f,  //1.0f, 1.0f //top right
+        0.5f, -0.5f,  0.5f,     0.0f, -1.0f,  0.0f,  1.0f, 1.0f, //top right
+        -0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,  0.0f, 1.0f, //top left
+        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,  0.0f, 0.0f, //bottom left
     };
 
     // first, configure the cube's VAO (and VBO)
@@ -236,11 +235,14 @@ int main()
     glBindVertexArray(cubeVAO);
     
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     // normal attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    // texture coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float))); //2-coluna onde começa / 2 - tamanho / 9N elementos na linha / 6 tamanho até inicio das normais
+    glEnableVertexAttribArray(2);
     
     // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
     unsigned int lightVAO;
@@ -267,53 +269,21 @@ int main()
     glBindVertexArray(floorVAO);
 
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     // normal attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
     // texture coord attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(6 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float))); //2-coluna onde começa / 2 - tamanho / 9N elementos na linha / 6 tamanho até inicio das normais
     glEnableVertexAttribArray(2);
 
-    diffusemap = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\wall.jpg");
-
+    //unsigned int texture1 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\awesomeface.png");
+      unsigned int texture1 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\wall.jpg");
     //---------------------------------------------------------------------------------------------------
 
-    //Create and load a texture
-    /*unsigned int texture1;
-    glGenTextures(1, &texture1);
-
-    //Set the texture wrapping parameters
-    glTextureParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTextureParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    
-    glBindTexture(GL_TEXTURE_CUBE_MAP, texture1);
-    //load image, create the texture and generate mipmaps
-    int width, height, nrChannels;
-    unsigned char* data = stbi_load("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\wall.jpg", &width, &height, &nrChannels, 0);
-    
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
-
-    ourShader.use();
-    glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0);
-    */
+    //lightingShader.use();
+    //glUniform1i(glGetUniformLocation(lightingShader.ID, "texture1"), 0);
 
     // render loop
     // -----------
@@ -349,23 +319,21 @@ int main()
         
         // world transformation
         glm::mat4 model = glm::mat4(1.0f);
-        //model = glm::rotate(model, ang, glm::vec3(0, 1, 0));
-        //model = glm::rotate(model, ang, glm::vec3(0, 1, 0));
-
-        //atualização da matrix model => lamp
+        
+        //atualização da matrix model
         lightingShader.setMat4("model", model);
+
+        //upload texture of shaders
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture1);
         
         // render the cube
         /*glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);*/
         //drawCubes(cubeVAO);
 
-        // bind textures on corresponding texture units
-        /*glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, texture1);*/
-        
         //drawing maze
-        goMaze(cubeVAO, lightingShader, model, floorVAO, diffusemap);
+        goMaze(cubeVAO, lightingShader, model, floorVAO);
 
         // also draw the lamp object
         lampShader.use();
@@ -479,7 +447,7 @@ glm::mat4 resetModel(glm::mat4 model) {
     return initial_model;
 }
 
-void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int floorVAO, unsigned int diffuseMap) {
+void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int floorVAO) {
     int i;
     int j;
 
@@ -511,9 +479,6 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
             else {
                 model = glm::translate(model, glm::vec3(i, 0, pos));
                 Light.setMat4("model", model);
-                // carrega a textura para os shaders
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, diffuseMap);
                 drawFloor(floorVAO);
             }
 

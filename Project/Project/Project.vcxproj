@@ -150,6 +150,7 @@
     <None Include="Source\2.1.basic_lighting.vs" />
     <None Include="Source\2.1.lamp.fs" />
     <None Include="Source\2.1.lamp.vs" />
+    <None Include="Source\floor.fs" />
     <None Include="Source\fragmentshader.fs" />
     <None Include="Source\FS.fs" />
     <None Include="Source\vertexshader.vs" />
@@ -161,6 +162,7 @@
     <ClInclude Include="Source\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Source\awesomeface.png" />
     <Image Include="Source\wall.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

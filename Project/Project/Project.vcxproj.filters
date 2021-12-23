@@ -31,6 +31,7 @@
     <None Include="Source\2.1.lamp.vs" />
     <None Include="Source\VS.vs" />
     <None Include="Source\FS.fs" />
+    <None Include="Source\floor.fs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.h">
@@ -45,6 +46,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Source\wall.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Source\awesomeface.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
