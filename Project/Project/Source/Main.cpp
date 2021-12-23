@@ -8,6 +8,7 @@
 #include <shader_m.h>
 #include <camera.h>
 #include <iostream>
+#include <vector>
 
 //nota => ver camera position com cube position
 
@@ -47,7 +48,9 @@ float ystep = 0.01f;
 float zstep = 0.01f;
 
 int stop = 0;
-double dArray[16] = { 0.0 };
+bool cont = false;
+int dArray[16] = { 0.0 };
+std::vector <int> arr;
 
 void drawCubes(unsigned int cubeVAO) {
     glBindVertexArray(cubeVAO);
@@ -397,7 +400,38 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_END) == GLFW_PRESS) {
         std::cout << "Camera X coordinates: " << camera.Position.x;
         std::cout << "Camera Y coordinates: " << camera.Position.y;
-        std::cout << "Camera Z coordinates: " << camera.Position.z;
+        std::cout << "Camera Z coordinates: " << camera.Position.z << "\n\n"; 
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS) {
+        /*glm::mat4 T = glm::mat4(1.0f);
+
+        std::vector <int> arr;
+        arr.push_back(1);
+        arr.push_back(2);
+        arr.push_back(3);
+        arr.insert(arr.end(),{ 6,9 });
+
+        for (int i : arr)
+            std::cout << i << "|";*/
+
+        /*double dArray[16] = {0.0};
+        const float* pSource = (const float*)glm::value_ptr(T);
+
+        std::cout << "\n" << "----------Antes-----------" << "\n";
+
+        for (int j = 0; j < 16; j++)
+            std::cout << "[" << dArray[j] << "]";
+
+        std::cout << "\n" << "----------Depois-----------" << "\n";
+        T = glm::translate(T, glm::vec3(1.0f, 0.0f, 1.0f));
+
+        for (int i = 0; i < 16; i++)
+            dArray[i] = pSource[i];
+        for (int j = 0; j < 16; j++)
+            std::cout << "[" << dArray[j] << "]";
+
+        std::cout << "\n" << "---------------------------" << "\n";*/
     }
 }
 
@@ -462,6 +496,7 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
     //inital_model corresponds to the point of origin
     glm::mat4 initial_model;
     initial_model = model;
+    std::vector <int> arr;
 
     for (i = 0; i < 5; i++) {
         int pos = 0;
@@ -470,9 +505,26 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
             pos = 5 - j;
             if (maze[i][j] == 1) {  // Means there is a cube 
                 model = glm::translate(model, glm::vec3(i, 0, pos));
+                Light.setMat4("model", model);
+
                 //pegar no modelo de ponto de origem e somar os valores x e z da translação => para obter as coordenadas de cada objeto no mundo
                 //nota: pôr num array de posições 
-                Light.setMat4("model", model);
+
+                //arr.insert(arr.end(), { 6,9 });
+
+                const float* pSource1 = (const float*)glm::value_ptr(camera.GetViewMatrix());
+                for (int z = 0; z < 16; ++z)
+                    dArray[z] = pSource1[z];
+
+                int dArray1[16] = { 0.0 };
+
+                const float* pSource = (const float*)glm::value_ptr(model);
+                for (int i = 0; i < 16; ++i)
+                    dArray1[i] = pSource[i];
+
+                //guarda posições de matriz de cubos no vector (tendo em conta "i" e "j")
+                arr.insert(arr.end(), {dArray1[12],dArray1[14]});
+                
                 drawCubes(cubeVAO);
             }
 
@@ -504,7 +556,34 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
                     std::cout << "|||||||" << "\n";
                 }
                 stop++;*/
+
+            if (stop < 5) {
+                std::cout << "VEC:";
+                for (int z = 0; z < arr.size(); ++z)
+                    std::cout << "[" << arr[z] << "]";
+                
+                std::cout << "\n";
+            }
         }
+
+        if (stop < 5) {
+            for (int z = 0; z < 16; ++z)
+                std::cout << "[" << dArray[z] << "]";
+
+            std::cout << "\n\n";
+        }
+
+        for (int j = 0; j <= arr.size() - 2; j = j + 2) {
+            if (dArray[12] == arr[j] && dArray[14] == arr[j + 1])
+                std::cout << "IGUAL" << "\n";
+        }
+
+        /*if (stop == 5) {
+            std::cout << "VEC:";
+            for (int z = 0; z < arr.size(); ++z)
+                std::cout << "[" << arr[z] << "]";
+        }*/
+        stop++;
     }
 }
 
