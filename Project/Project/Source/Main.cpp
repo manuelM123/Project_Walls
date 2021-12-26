@@ -47,16 +47,22 @@ float xstep = 0.01f;
 float ystep = 0.01f;
 float zstep = 0.01f;
 glm::vec3 PositionBefore = camera.Position;
+float controlX = 0.00f;
+float controlZ = 0.00f;
 
 int stop = 0;
+int stopV2 = 0;
 
 //variavel controlo
 int cont = 0;
 int wall = 0;
+int wallDetected = 0;
+bool wallDetectedV2 = false;
 
 int dArray[16] = { 0.0 };
 std::vector <int> arr;
 std::vector <float> arrLimits;
+std::vector <float> arrLimits2;
 
 void drawCubes(unsigned int cubeVAO) {
     glBindVertexArray(cubeVAO);
@@ -387,9 +393,9 @@ void processInput(GLFWwindow *window)
     
     //if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && yMax >= 105) ==> limite eixo y a usar quando jogador estiver bem posicionado
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS and camera.Position.y <= 3.0f and camera.Position.y >= -0.3f)
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS and camera.Position.y <= 3.0f and camera.Position.y >= -0.3f)
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         camera.ProcessKeyboard(BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         camera.ProcessKeyboard(LEFT, deltaTime);
@@ -439,9 +445,6 @@ void processInput(GLFWwindow *window)
         std::cout << "\n" << "---------------------------" << "\n";*/
 
         cont = 0;
-
-    std::cout << "EIXO X: " << PositionBefore.x << "\n";
-    std::cout << "EIXO Z: " << PositionBefore.z << "\n";
     }
 }
 
@@ -491,6 +494,7 @@ glm::mat4 resetModel(glm::mat4 model) {
     return initial_model;
 }
 
+//funcionalidade extra => implementar 3 sizes de maze (pequeno, médio, grande)
 void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int floorVAO) {
     int i;
     int j;
@@ -537,12 +541,6 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
 
                 float pos12 = (float)dArray1[12];
                 float pos14 = (float)dArray1[14];
-
-                /*float xPositive = pos12 + 0.64;
-                float xNegative = pos12 - 0.64;
-                float zPositive = pos14 + 0.64;
-                float zNegative = pos14 - 0.64;
-                */
 
                 float xPositive = pos12 + 0.62;
                 float xNegative = pos12 - 0.62;
@@ -645,24 +643,56 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
     }
 
     for (int j = 0; j <= arrLimits.size() - 4; j = j + 4) {
-        
-        if (camera.Position.x >= arrLimits[j + 1] && camera.Position.x <= arrLimits[j] && camera.Position.z >= arrLimits[j + 3] && camera.Position.z <= arrLimits[j + 2]) {
+
+        /*if (camera.Position.x >= arrLimits2[j + 1] && camera.Position.x <= arrLimits2[j] && camera.Position.z >= arrLimits2[j + 3] && camera.Position.z <= arrLimits2[j + 2]) {
+            if (stopV2 == 0)
+                PositionBefore = camera.Position;
+
             if (cont == 0) {
+            std::cout << "WALLINV" << "\n";
+            }
+
+            wallDetectedV2 = true;
+            stopV2 = 1;
+        }*/
+
+        if (camera.Position.x >= arrLimits[j + 1] && camera.Position.x <= arrLimits[j] && camera.Position.z >= arrLimits[j + 3] && camera.Position.z <= arrLimits[j + 2]) {
+            
+            camera.Position = PositionBefore;
+
+            //std::cout << "WALL" << "\n";
+            /*if (cont == 0) {
                 std::cout << "WALL" << "\n";
+                std::cout << "XANT:" << PositionBefore.x << "\n";
+                std::cout << "ZANT" << PositionBefore.z << "\n";
                 std::cout << "X: " << camera.Position.x << "\n";
                 std::cout << "Z: " << camera.Position.z << "\n";
                 std::cout << "J: " << j << "\n";
             }
-            cont = 1;
+
+            //cont = 1;
+            //wallDetected = 1;
+
+            stopV2 = 1;
+
+            camera.Position = PositionBefore; */
+
+            //std::cout << "SIM" << "\n";
         }
-             
+
+            /*if (cont == 0) {
+                std::cout << "ENTROU";
+                wallDetected = 0;
+                cont = 1;
+            }*/
+        
+
+        /*if (cont == 0) {
+            std::cout << "WALL?: " << wallDetected << "\n";
+            cont = 1;
+        }*/
     }
-
-    /*if (cont == 1) {
-        camera.Position.x = xPositionBefore;
-        camera.Position.z = zPositionBefore;
-    }*/
-
+    PositionBefore = camera.Position;
 }
 
 // utility function for loading a 2D texture from file
