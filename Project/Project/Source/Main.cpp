@@ -29,7 +29,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 // camera
-Camera camera(glm::vec3(6.0f, 2.0f, 2.0f));
+Camera camera(glm::vec3(0.0f, -0.3f, 2.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -46,11 +46,17 @@ glm::vec3 lightPos(0.0f, 3.0f, 0.0f);
 float xstep = 0.01f;
 float ystep = 0.01f;
 float zstep = 0.01f;
+glm::vec3 PositionBefore = camera.Position;
 
 int stop = 0;
-bool cont = false;
+
+//variavel controlo
+int cont = 0;
+int wall = 0;
+
 int dArray[16] = { 0.0 };
 std::vector <int> arr;
+std::vector <float> arrLimits;
 
 void drawCubes(unsigned int cubeVAO) {
     glBindVertexArray(cubeVAO);
@@ -390,8 +396,8 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
 
-    if (camera.Position.y > 3.0f)
-        camera.Position.y = 3.0f;
+    if (camera.Position.y > -0.3f)
+        camera.Position.y = -0.3f;
 
     if (camera.Position.y < -0.3f)
         camera.Position.y = -0.3f;
@@ -405,7 +411,6 @@ void processInput(GLFWwindow *window)
 
     if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS) {
         /*glm::mat4 T = glm::mat4(1.0f);
-
         std::vector <int> arr;
         arr.push_back(1);
         arr.push_back(2);
@@ -432,6 +437,11 @@ void processInput(GLFWwindow *window)
             std::cout << "[" << dArray[j] << "]";
 
         std::cout << "\n" << "---------------------------" << "\n";*/
+
+        cont = 0;
+
+    std::cout << "EIXO X: " << PositionBefore.x << "\n";
+    std::cout << "EIXO Z: " << PositionBefore.z << "\n";
     }
 }
 
@@ -524,6 +534,22 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
 
                 //guarda posições de matriz de cubos no vector (tendo em conta "i" e "j")
                 arr.insert(arr.end(), {dArray1[12],dArray1[14]});
+
+                float pos12 = (float)dArray1[12];
+                float pos14 = (float)dArray1[14];
+
+                /*float xPositive = pos12 + 0.64;
+                float xNegative = pos12 - 0.64;
+                float zPositive = pos14 + 0.64;
+                float zNegative = pos14 - 0.64;
+                */
+
+                float xPositive = pos12 + 0.62;
+                float xNegative = pos12 - 0.62;
+                float zPositive = pos14 + 0.62;
+                float zNegative = pos14 - 0.62;
+
+                arrLimits.insert(arrLimits.end(), {xPositive,xNegative,zPositive,zNegative});
                 
                 drawCubes(cubeVAO);
             }
@@ -557,13 +583,22 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
                 }
                 stop++;*/
 
-            if (stop < 5) {
+            /*if (stop < 5) {
                 std::cout << "VEC:";
                 for (int z = 0; z < arr.size(); ++z)
                     std::cout << "[" << arr[z] << "]";
                 
                 std::cout << "\n";
+            }*/
+
+            if (stop < 5) {
+                std::cout << "VEC Limits:";
+                for (int z = 0; z < arrLimits.size(); ++z)
+                    std::cout << "[" << arrLimits[z] << "]";
+
+                std::cout << "\n";
             }
+
         }
 
         if (stop < 5) {
@@ -573,18 +608,61 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
             std::cout << "\n\n";
         }
 
-        for (int j = 0; j <= arr.size() - 2; j = j + 2) {
-            if (dArray[12] == arr[j] && dArray[14] == arr[j + 1])
-                std::cout << "IGUAL" << "\n";
-        }
+        //parte das colisões ==> ver melhor ==> pontos negativos nas posições da câmera(dependendo da orientação da mesma)
+        /*for (int j = 0; j <= arr.size() - 2; j = j + 2) {
+            if (dArray[12] == arr[j] && dArray[14] == arr[j + 1]) {
+            //if (camera.Position.x == arr[j] || camera.Position.z == arr[j + 1]) {
+                std::cout << "ARR:" << arr[j] << "|" << arr[j + 1] << "\n";
+                }
+            //else
+                //std::cout << "CAM:" << dArray[12] << "|" << dArray[14] << "\n";
+        }*/
 
-        /*if (stop == 5) {
-            std::cout << "VEC:";
-            for (int z = 0; z < arr.size(); ++z)
-                std::cout << "[" << arr[z] << "]";
+        /*for (int j = 0; j <= arrLimits.size() - 4; j = j + 4) {
+            if(camera.Position.x >= arrLimits[j+1] && camera.Position.x <= arrLimits[j] && camera.Position.z >= arrLimits[j+3] && camera.Position.z <= arrLimits[j+2]){
+                if (cont == 0) {
+                    std::cout << "WALL" << "\n";
+                    std::cout << "X: " << xPositionBefore << "\n";
+                    std::cout << "Z: " << zPositionBefore << "\n";
+                    std::cout << "J: " << j << "\n";
+                }
+
+                camera.Position.x = xPositionBefore;
+                camera.Position.z = zPositionBefore;
+
+                cont = 1;
+            }
+            else {
+                xPositionBefore = camera.Position.x;
+                zPositionBefore = camera.Position.z;
+            }
+        }*/
+
+        /*if (stop == 4) {
+            std::cout << arr.size();
         }*/
         stop++;
     }
+
+    for (int j = 0; j <= arrLimits.size() - 4; j = j + 4) {
+        
+        if (camera.Position.x >= arrLimits[j + 1] && camera.Position.x <= arrLimits[j] && camera.Position.z >= arrLimits[j + 3] && camera.Position.z <= arrLimits[j + 2]) {
+            if (cont == 0) {
+                std::cout << "WALL" << "\n";
+                std::cout << "X: " << camera.Position.x << "\n";
+                std::cout << "Z: " << camera.Position.z << "\n";
+                std::cout << "J: " << j << "\n";
+            }
+            cont = 1;
+        }
+             
+    }
+
+    /*if (cont == 1) {
+        camera.Position.x = xPositionBefore;
+        camera.Position.z = zPositionBefore;
+    }*/
+
 }
 
 // utility function for loading a 2D texture from file
