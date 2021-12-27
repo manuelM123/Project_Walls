@@ -163,7 +163,15 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Source\awesomeface.png" />
+    <Image Include="Source\erva.jpg" />
+    <Image Include="Source\floor.png" />
+    <Image Include="Source\sky.png" />
     <Image Include="Source\wall.jpg" />
+    <Image Include="Source\wall1.jfif" />
+    <Image Include="Source\wall2.jpg" />
+    <Image Include="Source\wall3.png" />
+    <Image Include="Source\wall4.png" />
+    <Image Include="Source\wall5.jpeg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

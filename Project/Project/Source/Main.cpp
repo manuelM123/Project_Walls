@@ -20,7 +20,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
-void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int floorVAO);
+void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int floorVAO,Shader skyShader);
 unsigned int loadTexture(char const* path);
 glm::mat4 resetModel(glm::mat4 model);
 
@@ -29,7 +29,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 // camera
-Camera camera(glm::vec3(0.0f, -0.3f, 2.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 2.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -64,6 +64,11 @@ std::vector <int> arr;
 std::vector <float> arrLimits;
 std::vector <float> arrLimits2;
 
+//texturas
+unsigned int texture1;
+unsigned int texture2;
+unsigned int texture3;
+
 void drawCubes(unsigned int cubeVAO) {
     glBindVertexArray(cubeVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -72,6 +77,11 @@ void drawCubes(unsigned int cubeVAO) {
 void drawFloor(unsigned int floorVAO) {
     glBindVertexArray(floorVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void drawSky(unsigned int skyVAO) {
+    glBindVertexArray(skyVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 float ang = 0.01;
@@ -92,7 +102,7 @@ int main()
     
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Project Walls", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -125,9 +135,7 @@ int main()
     //C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source
     Shader lightingShader("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\2.1.basic_lighting.vs", "C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\2.1.basic_lighting.fs");
     Shader lampShader("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\2.1.lamp.vs", "C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\2.1.lamp.fs");
-    
-    //Shader ourShader("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\VS.vs", "C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\FS.fs");
-    
+    Shader skyShader("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\VS.vs", "C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\FS.fs");
     
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -238,6 +246,54 @@ int main()
         -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,  0.0f, 0.0f, //bottom left
     };
 
+    float skyVertices[] = {
+        //lados restantes     //normals            //texture coords
+        -20.0f, -20.0f, -20.0f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+        20.0f, -20.0f, -20.0f,  0.0f,  0.0f, -1.0f,   1.0f, 0.0f,
+        20.0f,  20.0f, -20.0f,  0.0f,  0.0f, -1.0f,   1.0f, 1.0f,
+        20.0f,  20.0f, -20.0f,  0.0f,  0.0f, -1.0f,   1.0f, 1.0f,
+        -20.0f,  20.0f, -20.0f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+        -20.0f, -20.0f, -20.0f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+
+        -20.0f, -20.0f,  20.0f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
+        20.0f, -20.0f,  20.0f,  0.0f,  0.0f,  1.0f,   1.0f, 0.0f,
+        20.0f,  20.0f,  20.0f,  0.0f,  0.0f,  1.0f,   1.0f, 1.0f,
+        20.0f,  20.0f,  20.0f,  0.0f,  0.0f,  1.0f,   1.0f, 1.0f,
+        -20.0f,  20.0f,  20.0f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,
+        -20.0f, -20.0f,  20.0f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
+
+        -20.0f,  20.0f,  20.0f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+        -20.0f,  20.0f, -20.0f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+        -20.0f, -20.0f, -20.0f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+        -20.0f, -20.0f, -20.0f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+        -20.0f, -20.0f,  20.0f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+        -20.0f,  20.0f,  20.0f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+
+        20.0f,  20.0f,  20.0f,  1.0f,  0.0f,  0.0f,   0.0f,  0.0f,
+        20.0f,  20.0f, -20.0f,  1.0f,  0.0f,  0.0f,   1.0f,  0.0f,
+        20.0f, -20.0f, -20.0f,  1.0f,  0.0f,  0.0f,   1.0f,  1.0f,
+        20.0f, -20.0f, -20.0f,  1.0f,  0.0f,  0.0f,   1.0f,  1.0f,
+        20.0f, -20.0f,  20.0f,  1.0f,  0.0f,  0.0f,   0.0f,  1.0f,
+        20.0f,  20.0f,  20.0f,  1.0f,  0.0f,  0.0f,   0.0f,  0.0f,
+
+        //floor of the sky         //normals     //texture coords
+        -20.0f, -20.0f, -20.0f,    0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+        20.0f, -20.0f, -20.0f,     0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+        20.0f, -20.0f,  20.0f,     0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+
+        20.0f, -20.0f,  20.0f,     0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+        -20.0f, -20.0f,  20.0f,    0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+        -20.0f, -20.0f, -20.0f,    0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+
+        //topo                   //normals            //texture coords
+        -20.0f,  20.0f, -20.0f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+        20.0f,  20.0f, -20.0f,  0.0f,  1.0f,  0.0f,   1.0f,  0.0f,
+        20.0f,  20.0f,  20.0f,  0.0f,  1.0f,  0.0f,   1.0f,  1.0f,
+        20.0f,  20.0f,  20.0f,  0.0f,  1.0f,  0.0f,   1.0f,  1.0f,
+        -20.0f,  20.0f,  20.0f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+        -20.0f,  20.0f, -20.0f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f
+    };
+
     // first, configure the cube's VAO (and VBO)
     unsigned int VBO, cubeVAO, VAO;
     //glGenVertexArrays(1, &cubeVAO);
@@ -293,12 +349,35 @@ int main()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float))); //2-coluna onde começa / 2 - tamanho / 9N elementos na linha / 6 tamanho até inicio das normais
     glEnableVertexAttribArray(2);
 
+    // forth, configure the sky's VAO (and VBO)
+    unsigned int VBO2, skyVAO;
+    glGenVertexArrays(1, &skyVAO);
+    glGenBuffers(1, &VBO2);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyVertices), skyVertices, GL_STATIC_DRAW);
+
+    glBindVertexArray(skyVAO);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // normal attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    // texture coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float))); //2-coluna onde começa / 2 - tamanho / 9N elementos na linha / 6 tamanho até inicio das normais
+    glEnableVertexAttribArray(2);
+
     //unsigned int texture1 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\awesomeface.png");
-      unsigned int texture1 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\wall.jpg");
+      texture1 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\wall5.jpeg");
+      texture2 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\sky.png");
+      texture3 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\floor.png");
     //---------------------------------------------------------------------------------------------------
 
     //lightingShader.use();
     //glUniform1i(glGetUniformLocation(lightingShader.ID, "texture1"), 0);
+    //glUniform1i(glGetUniformLocation(skyShader.ID, "texture2"), 1);
 
     // render loop
     // -----------
@@ -339,16 +418,24 @@ int main()
         lightingShader.setMat4("model", model);
 
         //upload texture of shaders
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
-        
-        // render the cube
-        /*glBindVertexArray(cubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);*/
-        //drawCubes(cubeVAO);
+        //glActiveTexture(GL_TEXTURE0);
+        //glBindTexture(GL_TEXTURE_2D, texture1);
 
         //drawing maze
-        goMaze(cubeVAO, lightingShader, model, floorVAO);
+        goMaze(cubeVAO, lightingShader, model, floorVAO, skyShader);
+
+        //activate sky shader
+        skyShader.use();
+        skyShader.setMat4("projection", projection);
+        skyShader.setMat4("view", view);
+        skyShader.setMat4("model", model);
+
+        //upload texture of shaders
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture2);
+
+        // render the sky
+        drawSky(skyVAO);
 
         // also draw the lamp object
         lampShader.use();
@@ -402,11 +489,27 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
 
-    if (camera.Position.y > -0.3f)
-        camera.Position.y = -0.3f;
 
-    if (camera.Position.y < -0.3f)
-        camera.Position.y = -0.3f;
+    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+        texture1 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\wall2.jpg");
+        texture3 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\erva.jpg");
+
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+        texture1 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\wall5.jpeg");
+        texture3 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\floor.png");
+    }
+
+    if (camera.Position.y > 0.0f)
+        camera.Position.y = 0.0f;
+
+    if (camera.Position.y < 0.0f)
+        camera.Position.y = 0.0f;
+
+    if (camera.Position.x < -0.50f)
+        camera.Position.x = -0.50f;
+
     
     //teste => para usar depois em colisões
     if (glfwGetKey(window, GLFW_KEY_END) == GLFW_PRESS) {
@@ -495,7 +598,7 @@ glm::mat4 resetModel(glm::mat4 model) {
 }
 
 //funcionalidade extra => implementar 3 sizes de maze (pequeno, médio, grande)
-void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int floorVAO) {
+void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int floorVAO, Shader skyShader) {
     int i;
     int j;
 
@@ -510,7 +613,7 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
     //inital_model corresponds to the point of origin
     glm::mat4 initial_model;
     initial_model = model;
-    std::vector <int> arr;
+    //std::vector <int> arr;
 
     for (i = 0; i < 5; i++) {
         int pos = 0;
@@ -519,6 +622,19 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
             pos = 5 - j;
             if (maze[i][j] == 1) {  // Means there is a cube 
                 model = glm::translate(model, glm::vec3(i, 0, pos));
+                //Light.setMat4("model", model);
+
+                Light.use();
+                Light.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+                Light.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+                Light.setVec3("lightPos", lightPos);
+                Light.setVec3("viewPos", camera.Position);
+
+                // view/projection transformations
+                glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+                glm::mat4 view = camera.GetViewMatrix();
+                Light.setMat4("projection", projection);
+                Light.setMat4("view", view);
                 Light.setMat4("model", model);
 
                 //pegar no modelo de ponto de origem e somar os valores x e z da translação => para obter as coordenadas de cada objeto no mundo
@@ -548,13 +664,30 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
                 float zNegative = pos14 - 0.62;
 
                 arrLimits.insert(arrLimits.end(), {xPositive,xNegative,zPositive,zNegative});
+
+                //upload texture of shaders
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, texture1);
                 
                 drawCubes(cubeVAO);
             }
 
             else {
                 model = glm::translate(model, glm::vec3(i, 0, pos));
-                Light.setMat4("model", model);
+                //Light.setMat4("model", model);
+
+                glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+                glm::mat4 view = camera.GetViewMatrix();
+                //activate sky shader
+                skyShader.use();
+                skyShader.setMat4("projection", projection);
+                skyShader.setMat4("view", view);
+                skyShader.setMat4("model", model);
+
+                //upload texture of shaders
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, texture3);
+
                 drawFloor(floorVAO);
             }
 

@@ -51,5 +51,27 @@
     <Image Include="Source\awesomeface.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Source\wall1.jfif" />
+    <Image Include="Source\wall3.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Source\wall2.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Source\wall4.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Source\sky.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Source\wall5.jpeg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Source\erva.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Source\floor.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
