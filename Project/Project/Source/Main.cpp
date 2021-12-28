@@ -20,7 +20,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
-void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int floorVAO,Shader skyShader);
+void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int floorVAO,Shader skyShader, unsigned int pointVAO);
 unsigned int loadTexture(char const* path);
 glm::mat4 resetModel(glm::mat4 model);
 
@@ -52,6 +52,10 @@ float controlZ = 0.00f;
 
 int stop = 0;
 int stopV2 = 0;
+int Point = 0;
+int firstTime = 0;
+
+int POINTS = 0;
 
 //variavel controlo
 int cont = 0;
@@ -59,15 +63,19 @@ int wall = 0;
 int wallDetected = 0;
 bool wallDetectedV2 = false;
 
+
 int dArray[16] = { 0.0 };
 std::vector <int> arr;
 std::vector <float> arrLimits;
 std::vector <float> arrLimits2;
+std::vector <float> alreadyThere;
 
 //texturas
 unsigned int texture1;
 unsigned int texture2;
 unsigned int texture3;
+
+bool showPoint = true;
 
 void drawCubes(unsigned int cubeVAO) {
     glBindVertexArray(cubeVAO);
@@ -82,6 +90,13 @@ void drawFloor(unsigned int floorVAO) {
 void drawSky(unsigned int skyVAO) {
     glBindVertexArray(skyVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+void drawPoints(unsigned int pointVAO, bool showPoint) {
+    if (showPoint == true) {
+        glBindVertexArray(pointVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
 }
 
 float ang = 0.01;
@@ -294,6 +309,56 @@ int main()
         -20.0f,  20.0f, -20.0f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f
     };
 
+
+    float pointsVertices[] = {
+
+        //lados restantes     //normals            //texture coords
+        -0.1f, -0.1f, -0.1f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+        0.1f, -0.1f, -0.1f,  0.0f,  0.0f, -1.0f,   1.0f, 0.0f,
+        0.1f,  0.1f, -0.1f,  0.0f,  0.0f, -1.0f,   1.0f, 1.0f,
+        0.1f,  0.1f, -0.1f,  0.0f,  0.0f, -1.0f,   1.0f, 1.0f,
+        -0.1f,  0.1f, -0.1f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+        -0.1f, -0.1f, -0.1f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+
+        -0.1f, -0.1f,  0.1f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
+        0.1f, -0.1f,  0.1f,  0.0f,  0.0f,  1.0f,   1.0f, 0.0f,
+        0.1f,  0.1f,  0.1f,  0.0f,  0.0f,  1.0f,   1.0f, 1.0f,
+        0.1f,  0.1f,  0.1f,  0.0f,  0.0f,  1.0f,   1.0f, 1.0f,
+        -0.1f,  0.1f,  0.1f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,
+        -0.1f, -0.1f,  0.1f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
+
+        -0.1f,  0.1f,  0.1f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+        -0.1f,  0.1f, -0.1f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+        -0.1f, -0.1f, -0.1f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+        -0.1f, -0.1f, -0.1f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+        -0.1f, -0.1f,  0.1f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+        -0.1f,  0.1f,  0.1f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+
+        0.1f,  0.1f,  0.1f,  1.0f,  0.0f,  0.0f,   0.0f,  0.0f,
+        0.1f,  0.1f, -0.1f,  1.0f,  0.0f,  0.0f,   1.0f,  0.0f,
+        0.1f, -0.1f, -0.1f,  1.0f,  0.0f,  0.0f,   1.0f,  1.0f,
+        0.1f, -0.1f, -0.1f,  1.0f,  0.0f,  0.0f,   1.0f,  1.0f,
+        0.1f, -0.1f,  0.1f,  1.0f,  0.0f,  0.0f,   0.0f,  1.0f,
+        0.1f,  0.1f,  0.1f,  1.0f,  0.0f,  0.0f,   0.0f,  0.0f,
+
+        //floor of the labirint //normals     //texture coords
+        -0.1f, -0.1f, -0.1f,    0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+        0.1f, -0.1f, -0.1f,     0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+        0.1f, -0.1f,  0.1f,     0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+
+        0.1f, -0.1f,  0.1f,     0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+        -0.1f, -0.1f,  0.1f,    0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+        -0.1f, -0.1f, -0.1f,    0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+
+        //topo                //normals            //texture coords
+        -0.1f,  0.1f, -0.1f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+        0.1f,  0.1f,  -0.1f,  0.0f,  1.0f,  0.0f,   1.0f,  0.0f,
+        0.1f,  0.1f,   0.1f,  0.0f,  1.0f,  0.0f,   1.0f,  1.0f,
+        0.1f,  0.1f,   0.1f,  0.0f,  1.0f,  0.0f,   1.0f,  1.0f,
+        -0.1f,  0.1f,  0.1f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+        -0.1f,  0.1f, -0.1f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f
+    };
+
     // first, configure the cube's VAO (and VBO)
     unsigned int VBO, cubeVAO, VAO;
     //glGenVertexArrays(1, &cubeVAO);
@@ -369,6 +434,26 @@ int main()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float))); //2-coluna onde começa / 2 - tamanho / 9N elementos na linha / 6 tamanho até inicio das normais
     glEnableVertexAttribArray(2);
 
+    // fifth, configure the point's VAO (and VBO)
+    unsigned int VBO3, pointVAO;
+    glGenVertexArrays(1, &pointVAO);
+    glGenBuffers(1, &VBO3);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO3);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(pointsVertices), pointsVertices, GL_STATIC_DRAW);
+
+    glBindVertexArray(pointVAO);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // normal attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    // texture coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float))); //2-coluna onde começa / 2 - tamanho / 9N elementos na linha / 6 tamanho até inicio das normais
+    glEnableVertexAttribArray(2);
+
     //unsigned int texture1 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\awesomeface.png");
       texture1 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\wall5.jpeg");
       texture2 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\sky.png");
@@ -422,7 +507,7 @@ int main()
         //glBindTexture(GL_TEXTURE_2D, texture1);
 
         //drawing maze
-        goMaze(cubeVAO, lightingShader, model, floorVAO, skyShader);
+        goMaze(cubeVAO, lightingShader, model, floorVAO, skyShader, pointVAO);
 
         //activate sky shader
         skyShader.use();
@@ -598,7 +683,7 @@ glm::mat4 resetModel(glm::mat4 model) {
 }
 
 //funcionalidade extra => implementar 3 sizes de maze (pequeno, médio, grande)
-void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int floorVAO, Shader skyShader) {
+void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int floorVAO, Shader skyShader, unsigned int pointVAO) {
     int i;
     int j;
 
@@ -670,6 +755,13 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
                 glBindTexture(GL_TEXTURE_2D, texture1);
                 
                 drawCubes(cubeVAO);
+
+                for (int j = 0; j <= arrLimits.size() - 4; j = j + 4) {
+                    if (camera.Position.x >= arrLimits[j + 1] && camera.Position.x <= arrLimits[j] && camera.Position.z >= arrLimits[j + 3] && camera.Position.z <= arrLimits[j + 2]) {
+                        camera.Position = PositionBefore;
+                    }  
+                }
+                PositionBefore = camera.Position;
             }
 
             else {
@@ -689,38 +781,91 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
                 glBindTexture(GL_TEXTURE_2D, texture3);
 
                 drawFloor(floorVAO);
+
+                if (i > 0 && i%2 != 0) {
+
+                        int dArray2[16] = { 0.0 };
+
+                        const float* pSource2 = (const float*)glm::value_ptr(model);
+                        for (int i = 0; i < 16; ++i)
+                            dArray2[i] = pSource2[i];
+
+                        float pos12V2 = (float)dArray2[12];
+                        float pos14V2 = (float)dArray2[14];
+
+                        float xPositive2 = pos12V2 + 0.20;
+                        float xNegative2 = pos12V2 - 0.20;
+                        float zPositive2 = pos14V2 + 0.20;
+                        float zNegative2 = pos14V2 - 0.20;
+
+                        arrLimits2.insert(arrLimits2.end(), { xPositive2,xNegative2,zPositive2,zNegative2 });
+
+                    float x = 0.00f;
+                    float z = 0.00f;
+
+                    float X = 0.00f;
+                    float X1 = 0.00f;
+                    float Z1 = 0.00f;
+                    float Z2 = 0.00f;
+
+                    int currentPos = 0;
+
+                    bool existe = false;
+
+                    int count = 0;
+
+                    for (int j = 0; j <= arrLimits2.size() - 4; j = j + 4) {
+                        if (camera.Position.x >= arrLimits2[j + 1] && camera.Position.x <= arrLimits2[j] && camera.Position.z >= arrLimits2[j + 3] && camera.Position.z <= arrLimits2[j + 2]){
+                            if (alreadyThere.size() == 0) {
+                                POINTS++;
+                                alreadyThere.insert(alreadyThere.end(), {arrLimits2[j], arrLimits2[j+1],arrLimits2[j+2],arrLimits2[j+3]});
+                            }
+
+                            if (alreadyThere.size() != 0) {
+
+                                X = arrLimits2[j];
+                                X1 = arrLimits2[j + 1];
+                                Z1 = arrLimits2[j + 2];
+                                Z2 = arrLimits2[j + 3];
+
+                                for (int t = 0; t <= alreadyThere.size() - 4; t = t + 4) {
+                                    if (camera.Position.x <= alreadyThere[t] && camera.Position.x >= alreadyThere[t + 1] && camera.Position.z <= alreadyThere[t + 2] && camera.Position.z >= alreadyThere[t + 3]) {
+                                        existe = true;
+                                    }
+                                }
+
+                                if (existe == false) {
+                                    POINTS++;
+                                    //std::cout << "|||||||||||ENTROU||||||||||||||||";
+                                    alreadyThere.insert(alreadyThere.end(), { X,X1,Z1,Z2 });
+                                }
+                            }
+                        }
+                    }
+
+                    if (alreadyThere.size() != 0) {
+                        for (int t = 0; t <= alreadyThere.size() - 4; t = t + 4) {
+                            if (xPositive2 == alreadyThere[t] && xNegative2 == alreadyThere[t + 1] && zPositive2 == alreadyThere[t + 2] && zNegative2 == alreadyThere[t + 3]) {
+                                showPoint = false;
+                                if (cont == 0) {
+                                    std::cout << POINTS << "\n";
+                                    cont = 1;
+                                }
+                                break;
+                            }
+                            else
+                                showPoint = true;
+                        }
+                    }
+
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, texture1);
+                    drawPoints(pointVAO,showPoint);
+                }
+
             }
 
-            /*double dArray[16] = {0.0};
-
-            const float* pSource = (const float*)glm::value_ptr(model);
-            for (int i = 0; i < 16; ++i)
-                dArray[i] = pSource[i];
-
-            for (int t = 0; t < 16; t++) {
-                if (camera.Position.x == dArray[t] || camera.Position.z == dArray[t])
-                    std::cout << "IGUAL ";
-            }*/
-
-            /*if (stop == 0) {
-                    const float* pSource = (const float*)glm::value_ptr(model);
-                    for (int i = 0; i < 16; ++i)
-                        dArray[i] = pSource[i];
-
-                    for (int t = 0; t < 16; t++) {
-                        std::cout << "Number t: " << dArray[t] << "\n";
-                    }
-                    std::cout << "|||||||" << "\n";
-                }
-                stop++;*/
-
-            /*if (stop < 5) {
-                std::cout << "VEC:";
-                for (int z = 0; z < arr.size(); ++z)
-                    std::cout << "[" << arr[z] << "]";
-                
-                std::cout << "\n";
-            }*/
+            //---------------------------------------------------------------------------------------
 
             if (stop < 5) {
                 std::cout << "VEC Limits:";
@@ -774,58 +919,6 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
         }*/
         stop++;
     }
-
-    for (int j = 0; j <= arrLimits.size() - 4; j = j + 4) {
-
-        /*if (camera.Position.x >= arrLimits2[j + 1] && camera.Position.x <= arrLimits2[j] && camera.Position.z >= arrLimits2[j + 3] && camera.Position.z <= arrLimits2[j + 2]) {
-            if (stopV2 == 0)
-                PositionBefore = camera.Position;
-
-            if (cont == 0) {
-            std::cout << "WALLINV" << "\n";
-            }
-
-            wallDetectedV2 = true;
-            stopV2 = 1;
-        }*/
-
-        if (camera.Position.x >= arrLimits[j + 1] && camera.Position.x <= arrLimits[j] && camera.Position.z >= arrLimits[j + 3] && camera.Position.z <= arrLimits[j + 2]) {
-            
-            camera.Position = PositionBefore;
-
-            //std::cout << "WALL" << "\n";
-            /*if (cont == 0) {
-                std::cout << "WALL" << "\n";
-                std::cout << "XANT:" << PositionBefore.x << "\n";
-                std::cout << "ZANT" << PositionBefore.z << "\n";
-                std::cout << "X: " << camera.Position.x << "\n";
-                std::cout << "Z: " << camera.Position.z << "\n";
-                std::cout << "J: " << j << "\n";
-            }
-
-            //cont = 1;
-            //wallDetected = 1;
-
-            stopV2 = 1;
-
-            camera.Position = PositionBefore; */
-
-            //std::cout << "SIM" << "\n";
-        }
-
-            /*if (cont == 0) {
-                std::cout << "ENTROU";
-                wallDetected = 0;
-                cont = 1;
-            }*/
-        
-
-        /*if (cont == 0) {
-            std::cout << "WALL?: " << wallDetected << "\n";
-            cont = 1;
-        }*/
-    }
-    PositionBefore = camera.Position;
 }
 
 // utility function for loading a 2D texture from file
