@@ -47,22 +47,11 @@ float xstep = 0.01f;
 float ystep = 0.01f;
 float zstep = 0.01f;
 glm::vec3 PositionBefore = camera.Position;
-float controlX = 0.00f;
-float controlZ = 0.00f;
-
-int stop = 0;
-int stopV2 = 0;
-int Point = 0;
-int firstTime = 0;
 
 int POINTS = 0;
 
 //variavel controlo
 int cont = 0;
-int wall = 0;
-int wallDetected = 0;
-bool wallDetectedV2 = false;
-
 
 int dArray[16] = { 0.0 };
 std::vector <int> arr;
@@ -687,12 +676,15 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
     int i;
     int j;
 
-    int maze[5][6] = {
+    int maze[8][6] = {
         {1,1,0,0,1,1},
-        {1,1,1,0,0,1},
+        {1,0,1,0,0,1},
         {1,0,0,1,0,1},
-        {1,1,0,0,0,1},
-        {1,1,0,1,1,1}
+        {1,0,0,0,0,1},
+        {1,1,0,1,0,1},
+        {1,1,1,1,0,1},
+        {1,0,0,0,0,1},
+        {1,0,1,1,1,1},
     };
 
     //inital_model corresponds to the point of origin
@@ -700,7 +692,7 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
     initial_model = model;
     //std::vector <int> arr;
 
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < 8; i++) {
         int pos = 0;
         for (j = 5; j >= 0; j--) {
             model = resetModel(initial_model);
@@ -847,10 +839,10 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
                         for (int t = 0; t <= alreadyThere.size() - 4; t = t + 4) {
                             if (xPositive2 == alreadyThere[t] && xNegative2 == alreadyThere[t + 1] && zPositive2 == alreadyThere[t + 2] && zNegative2 == alreadyThere[t + 3]) {
                                 showPoint = false;
-                                if (cont == 0) {
+                                //if (cont == 0) {
                                     std::cout << POINTS << "\n";
                                     cont = 1;
-                                }
+                                //}
                                 break;
                             }
                             else
@@ -867,22 +859,22 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
 
             //---------------------------------------------------------------------------------------
 
-            if (stop < 5) {
+            /*if (stop < 5) {
                 std::cout << "VEC Limits:";
                 for (int z = 0; z < arrLimits.size(); ++z)
                     std::cout << "[" << arrLimits[z] << "]";
 
                 std::cout << "\n";
-            }
+            }*/
 
         }
 
-        if (stop < 5) {
+        /*if (stop < 5) {
             for (int z = 0; z < 16; ++z)
                 std::cout << "[" << dArray[z] << "]";
 
             std::cout << "\n\n";
-        }
+        }*/
 
         //parte das colisões ==> ver melhor ==> pontos negativos nas posições da câmera(dependendo da orientação da mesma)
         /*for (int j = 0; j <= arr.size() - 2; j = j + 2) {
@@ -917,7 +909,7 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
         /*if (stop == 4) {
             std::cout << arr.size();
         }*/
-        stop++;
+        //stop++;
     }
 }
 
