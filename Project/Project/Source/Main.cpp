@@ -16,11 +16,19 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int floorVAO,Shader skyShader, unsigned int pointVAO);
+void draw(void);
+void drawHUD(void);
+void transferDataToGPUMemory(void);
+GLuint LoadShaders(const char* vertex_file_path, const char* fragment_file_path);
+GLuint programID;
+GLuint VertexArrayID;
+GLuint vertexbuffer;
+GLuint colorbuffer;
+unsigned int loadTexture(char const* path);
 unsigned int loadTexture(char const* path);
 glm::mat4 resetModel(glm::mat4 model);
 
@@ -123,7 +131,6 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
     
@@ -145,10 +152,11 @@ int main()
     // build and compile our shader zprogram
     // ------------------------------------
 
-    //C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source
-    Shader lightingShader("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\2.1.basic_lighting.vs", "C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\2.1.basic_lighting.fs");
-    Shader lampShader("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\2.1.lamp.vs", "C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\2.1.lamp.fs");
-    Shader skyShader("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\VS.vs", "C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\FS.fs");
+    // C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source
+    // C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source
+    Shader lightingShader("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\2.1.basic_lighting.vs", "C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\2.1.basic_lighting.fs");
+    Shader lampShader("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\2.1.lamp.vs", "C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\2.1.lamp.fs");
+    Shader skyShader("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\VS.vs", "C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\FS.fs");
     
 
     //------------------------------
@@ -497,10 +505,10 @@ int main()
     glEnableVertexAttribArray(2);
 
     //unsigned int texture1 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\awesomeface.png");
-      texture1 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\wall5.jpeg");
-      texture2 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\sky.png");
-      texture3 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\floor.png");
-      texture4 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\wall4.png");
+      texture1 = loadTexture("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\wall5.jpeg");
+      texture2 = loadTexture("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\sky.png");
+      texture3 = loadTexture("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\floor.png");
+      texture4 = loadTexture("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\wall4.png");
     //---------------------------------------------------------------------------------------------------
 
     //lightingShader.use();
@@ -511,85 +519,95 @@ int main()
     // -----------
     while (!glfwWindowShouldClose(window))
     {
-        // per-frame time logic
-        // --------------------
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-        
-        // input
-        // -----
-        processInput(window);
-        
-        // render
-        // ------
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-        // be sure to activate shader when setting uniforms/drawing objects
-        lightingShader.use();
-        lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-        lightingShader.setVec3("lightPos", lightPos);
-        lightingShader.setVec3("viewPos", camera.Position);
-        
-        // view/projection transformations
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        glm::mat4 view = camera.GetViewMatrix();
-        lightingShader.setMat4("projection", projection);
-        lightingShader.setMat4("view", view);
-        
-        // world transformation
-        glm::mat4 model = glm::mat4(1.0f);
-        
-        //atualização da matrix model
-        lightingShader.setMat4("model", model);
+        for(int i=0; i<2 ; i++)
+        {
+            if (i == 0)
+            {
+                glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
-        //upload texture of shaders
-        //glActiveTexture(GL_TEXTURE0);
-        //glBindTexture(GL_TEXTURE_2D, texture1);
+                // per-frame time logic
+                // --------------------
+                float currentFrame = glfwGetTime();
+                deltaTime = currentFrame - lastFrame;
+                lastFrame = currentFrame;
 
-        //drawing maze
-        goMaze(cubeVAO, lightingShader, model, floorVAO, skyShader, pointVAO);
+                // input
+                // -----
+                processInput(window);
 
-        //activate sky shader
-        skyShader.use();
-        skyShader.setMat4("projection", projection);
-        skyShader.setMat4("view", view);
-        skyShader.setMat4("model", model);
+                // render
+                // ------
+                glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //upload texture of shaders
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture4);
+                // be sure to activate shader when setting uniforms/drawing objects
+                lightingShader.use();
+                lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+                lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+                lightingShader.setVec3("lightPos", lightPos);
+                lightingShader.setVec3("viewPos", camera.Position);
 
-        // render the menu
-        drawMenu(menuVAO);
+                // view/projection transformations
+                glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+                glm::mat4 view = camera.GetViewMatrix();
+                lightingShader.setMat4("projection", projection);
+                lightingShader.setMat4("view", view);
 
-        //upload texture of shaders
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture2);
+                // world transformation
+                glm::mat4 model = glm::mat4(1.0f);
 
-        // render the sky
-        drawSky(skyVAO);
+                //atualização da matrix model
+                lightingShader.setMat4("model", model);
 
-        // also draw the lamp object
-        lampShader.use();
-        lampShader.setMat4("projection", projection);
-        lampShader.setMat4("view", view);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-        lampShader.setMat4("model", model);
-        
-        glBindVertexArray(lightVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+                //upload texture of shaders
+                //glActiveTexture(GL_TEXTURE0);
+                //glBindTexture(GL_TEXTURE_2D, texture1);
 
-        //ourShader.use();
-        
+                //drawing maze
+                goMaze(cubeVAO, lightingShader, model, floorVAO, skyShader, pointVAO);
+
+                //activate sky shader
+                skyShader.use();
+                skyShader.setMat4("projection", projection);
+                skyShader.setMat4("view", view);
+                skyShader.setMat4("model", model);
+
+                //upload texture of shaders
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, texture4);
+
+                // render the menu
+                drawMenu(menuVAO);
+
+                //upload texture of shaders
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, texture2);
+
+                // render the sky
+                drawSky(skyVAO);
+
+                // also draw the lamp object
+                lampShader.use();
+                lampShader.setMat4("projection", projection);
+                lampShader.setMat4("view", view);
+                model = glm::mat4(1.0f);
+                model = glm::translate(model, lightPos);
+                model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+                lampShader.setMat4("model", model);
+
+                glBindVertexArray(lightVAO);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+                glfwSwapBuffers(window);
+            }
+            else
+            {
+                drawHUD();
+                glfwSwapBuffers(window);
+            }
+        }
         
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
-        glfwSwapBuffers(window);
         glfwPollEvents();
     }
     
@@ -604,6 +622,197 @@ int main()
     // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
+}
+
+void drawHUD()
+{
+    glViewport(0, SCR_HEIGHT * 0.875, SCR_WIDTH * 0.25, SCR_HEIGHT * 0.125);
+    transferDataToGPUMemory();
+    draw();
+}
+
+void transferDataToGPUMemory(void)
+{
+    // VAO
+    glGenVertexArrays(1, &VertexArrayID);
+    glBindVertexArray(VertexArrayID);
+
+    // Create and compile our GLSL program from the shaders
+    programID = LoadShaders("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\SimpleVertexShader.vs", "C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\SimpleFragmentShader.fs");
+
+    static const GLfloat g_vertex_buffer_data[] = {
+        0.0f,  0.0f,  0.0f,
+        20.0f, 0.0f,  0.0f,
+        20.0f, 20.0f, 0.0f,
+        0.0f,  0.0f,  0.0f,
+        20.0f, 20.0f, 0.0f,
+        0.0f,  20.0f, 0.0f,
+        0.0f,  20.0f, 0.0f,
+        20.0f, 20.0f, 0.0f,
+        10.0f, 30.0f, 0.0f,
+    };
+
+    // One color for each vertex. They were generated randomly.
+    static const GLfloat g_color_buffer_data[] = {
+        1.0f,  0.0f,  0.0f,
+        1.0f,  0.0f,  0.0f,
+        1.0f,  0.0f,  0.0f,
+        1.0f,  0.0f,  0.0f,
+        1.0f,  0.0f,  0.0f,
+        1.0f,  0.0f,  0.0f,
+        0.0f,  1.0f,  0.0f,
+        0.0f,  1.0f,  0.0f,
+        0.0f,  1.0f,  0.0f,
+    };
+
+    // Move vertex data to video memory; specifically to VBO called vertexbuffer
+    glGenBuffers(1, &vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+    // Move color data to video memory; specifically to CBO called colorbuffer
+    glGenBuffers(1, &colorbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+
+}
+
+GLuint LoadShaders(const char* vertex_file_path, const char* fragment_file_path) {
+
+    // Create the shaders   - Step 1
+    GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+    GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+
+    // Read the Vertex Shader code from the file       - Step 2
+    std::string VertexShaderCode;
+    std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
+    if (VertexShaderStream.is_open()) {
+        std::stringstream sstr;
+        sstr << VertexShaderStream.rdbuf();
+        VertexShaderCode = sstr.str();
+        VertexShaderStream.close();
+    }
+    else {
+        printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", vertex_file_path);
+        getchar();
+        return 0;
+    }
+
+    // Read the Fragment Shader code from the file      - Step 2
+    std::string FragmentShaderCode;
+    std::ifstream FragmentShaderStream(fragment_file_path, std::ios::in);
+    if (FragmentShaderStream.is_open()) {
+        std::stringstream sstr;
+        sstr << FragmentShaderStream.rdbuf();
+        FragmentShaderCode = sstr.str();
+        FragmentShaderStream.close();
+    }
+
+    GLint Result = GL_FALSE;
+    int InfoLogLength;
+
+    // Compile Vertex Shader        - Step 3
+    char const* VertexSourcePointer = VertexShaderCode.c_str();
+    glShaderSource(VertexShaderID, 1, &VertexSourcePointer, NULL);
+    glCompileShader(VertexShaderID);
+
+    // Check Vertex Shader
+    glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
+    glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+    if (InfoLogLength > 0) {
+        //char VertexShaderErrorMessage[InfoLogLength + 1];
+        GLchar* VertexShaderErrorMessage = (GLchar*)malloc(sizeof(GLchar) * InfoLogLength + 1);
+        glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
+        std::cout << &VertexShaderErrorMessage[0] << std::endl;
+        //printf("%s\n", &VertexShaderErrorMessage[0]);
+    }
+
+    // Compile Fragment Shader      - Step 3
+    char const* FragmentSourcePointer = FragmentShaderCode.c_str();
+    glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer, NULL);
+    glCompileShader(FragmentShaderID);
+
+    // Check Fragment Shader
+    glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
+    glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+    if (InfoLogLength > 0) {
+        // char FragmentShaderErrorMessage[InfoLogLength + 1];
+        GLchar* FragmentShaderErrorMessage = (GLchar*)malloc(sizeof(GLchar) * InfoLogLength + 1);
+        glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
+        std::cout << &FragmentShaderErrorMessage[0] << std::endl;
+        //printf("%s\n", &FragmentShaderErrorMessage[0]);
+    }
+
+    // Link the program
+    GLuint ProgramID = glCreateProgram();           // - Step 4
+    glAttachShader(ProgramID, VertexShaderID);      // - Step 5
+    glAttachShader(ProgramID, FragmentShaderID);    // - Step 5
+    glLinkProgram(ProgramID);                       // - Step 6
+
+    // Check the program
+    glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
+    glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+    if (InfoLogLength > 0) {
+        //char ProgramErrorMessage[InfoLogLength + 1];
+        GLchar* ProgramErrorMessage = (GLchar*)malloc(sizeof(GLchar) * InfoLogLength + 1);
+        glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
+        std::cout << &ProgramErrorMessage[0] << std::endl;
+        //printf("%s\n", &ProgramErrorMessage[0]);
+    }
+
+    glDetachShader(ProgramID, VertexShaderID);
+    glDetachShader(ProgramID, FragmentShaderID);
+
+    glDeleteShader(VertexShaderID);
+    glDeleteShader(FragmentShaderID);
+
+    return ProgramID;
+}
+
+void draw(void)
+{
+    // Clear the screen
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // Use our shader
+    glUseProgram(programID);
+
+    // define domain in R^2
+    glm::mat4 mvp = glm::ortho(-40.0f, 40.0f, -40.0f, 40.0f);
+    unsigned int matrix = glGetUniformLocation(programID, "mvp");
+    glUniformMatrix4fv(matrix, 1, GL_FALSE, &mvp[0][0]);
+
+    // 1rst attribute buffer : vertices
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    glVertexAttribPointer(
+        0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+        3,                  // size
+        GL_FLOAT,           // type
+        GL_FALSE,           // normalized?
+        0,                  // stride
+        (void*)0            // array buffer offset
+    );
+
+    // 2nd attribute buffer : colors
+    glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+    glVertexAttribPointer(
+        1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
+        3,                                // size
+        GL_FLOAT,                         // type
+        GL_FALSE,                         // normalized?
+        0,                                // stride
+        (void*)0                          // array buffer offset
+    );
+
+
+    // Draw the triangle !
+    glDrawArrays(GL_TRIANGLES, 0, 9); // indices starting at 0 and 9 points -> 3 triangles
+//    glDrawArrays(GL_TRIANGLE_STRIP, 0, 5); // five points -> 3 triangles
+
+    glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
@@ -641,14 +850,14 @@ void processInput(GLFWwindow *window)
     }
 
     if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
-        texture1 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\wall2.jpg");
-        texture3 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\erva.jpg");
+        texture1 = loadTexture("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\wall2.jpg");
+        texture3 = loadTexture("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\erva.jpg");
 
     }
 
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-        texture1 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\wall5.jpeg");
-        texture3 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\floor.png");
+        texture1 = loadTexture("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\wall5.jpeg");
+        texture3 = loadTexture("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\floor.png");
     }
 
     //teste => para usar depois em colisões
@@ -667,46 +876,11 @@ void processInput(GLFWwindow *window)
     }
 
     if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS) {
-        /*glm::mat4 T = glm::mat4(1.0f);
-        std::vector <int> arr;
-        arr.push_back(1);
-        arr.push_back(2);
-        arr.push_back(3);
-        arr.insert(arr.end(),{ 6,9 });
-
-        for (int i : arr)
-            std::cout << i << "|"; dsdsdsds*/
-
-        /*double dArray[16] = {0.0};
-        const float* pSource = (const float*)glm::value_ptr(T);
-
-        std::cout << "\n" << "----------Antes-----------" << "\n";
-
-        for (int j = 0; j < 16; j++)
-            std::cout << "[" << dArray[j] << "]";
-
-        std::cout << "\n" << "----------Depois-----------" << "\n";
-        T = glm::translate(T, glm::vec3(1.0f, 0.0f, 1.0f));
-
-        for (int i = 0; i < 16; i++)
-            dArray[i] = pSource[i];
-        for (int j = 0; j < 16; j++)
-            std::cout << "[" << dArray[j] << "]";
-
-        std::cout << "\n" << "---------------------------" << "\n";*/
-
         cont = 0;
     }
 }
 
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    // make sure the viewport matches the new window dimensions; note that width and
-    // height will be significantly larger than specified on retina displays.
-    glViewport(0, 0, width, height);
-}
+
 
 
 // glfw: whenever the mouse moves, this callback is called
@@ -1026,10 +1200,3 @@ unsigned int loadTexture(char const* path)
 
     return textureID;
 }
-
-
-
-
-
-    
-
