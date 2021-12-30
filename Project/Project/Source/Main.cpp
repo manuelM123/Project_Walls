@@ -601,7 +601,7 @@ void processInput(GLFWwindow *window)
         arr.insert(arr.end(),{ 6,9 });
 
         for (int i : arr)
-            std::cout << i << "|";*/
+            std::cout << i << "|"; dsdsdsds*/
 
         /*double dArray[16] = {0.0};
         const float* pSource = (const float*)glm::value_ptr(T);
