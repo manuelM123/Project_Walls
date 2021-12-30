@@ -29,10 +29,13 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 // camera
+//Camera X coordinates: 66.4122Camera Y coordinates: 1.85396Camera Z coordinates: 1.10673
 Camera camera(glm::vec3(0.0f, 0.0f, 2.0f));
+
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
+bool cameraUnlocked = false;
 
 // timing
 float deltaTime = 0.0f;
@@ -63,6 +66,7 @@ std::vector <float> alreadyThere;
 unsigned int texture1;
 unsigned int texture2;
 unsigned int texture3;
+unsigned int texture4;
 
 bool showPoint = true;
 
@@ -86,6 +90,11 @@ void drawPoints(unsigned int pointVAO, bool showPoint) {
         glBindVertexArray(pointVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
+}
+
+void drawMenu(unsigned int menuVAO) {
+     glBindVertexArray(menuVAO);
+     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 float ang = 0.01;
@@ -140,6 +149,22 @@ int main()
     Shader lightingShader("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\2.1.basic_lighting.vs", "C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\2.1.basic_lighting.fs");
     Shader lampShader("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\2.1.lamp.vs", "C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\2.1.lamp.fs");
     Shader skyShader("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\VS.vs", "C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\FS.fs");
+    
+
+    //------------------------------
+    camera.Position.x = 65.691f;
+    camera.Position.y = 1.85396f;
+    camera.Position.z = -0.159782f;
+
+    camera.Front.x = -0.999985f;
+    camera.Front.y = 0.00174533f;
+    camera.Front.z = 0.00523764f;
+
+    camera.Up.x = 0.0017453f;
+    camera.Up.y = 0.999998f;
+    camera.Up.z = -9.1414e-06f;
+    //------------------------------
+    
     
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -298,6 +323,14 @@ int main()
         -20.0f,  20.0f, -20.0f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f
     };
 
+    float menu[] = {
+        30.0f,  20.0f,  20.0f,  -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+        30.0f,  20.0f, -20.0f,  -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+        30.0f, -20.0f, -20.0f,  -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+        30.0f, -20.0f, -20.0f,  -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+        30.0f, -20.0f,  20.0f,  -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+        30.0f,  20.0f,  20.0f,  -1.0f,  0.0f,  0.0f,  0.0f,  0.0f
+    };
 
     float pointsVertices[] = {
 
@@ -443,10 +476,31 @@ int main()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float))); //2-coluna onde começa / 2 - tamanho / 9N elementos na linha / 6 tamanho até inicio das normais
     glEnableVertexAttribArray(2);
 
+    // sixth, configure the menu's VAO (and VBO)
+    unsigned int VBO4, menuVAO;
+    glGenVertexArrays(1, &menuVAO);
+    glGenBuffers(1, &VBO4);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO4);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(menu), menu, GL_STATIC_DRAW);
+
+    glBindVertexArray(menuVAO);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // normal attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    // texture coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float))); //2-coluna onde começa / 2 - tamanho / 9N elementos na linha / 6 tamanho até inicio das normais
+    glEnableVertexAttribArray(2);
+
     //unsigned int texture1 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\awesomeface.png");
       texture1 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\wall5.jpeg");
       texture2 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\sky.png");
       texture3 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\floor.png");
+      texture4 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\wall4.png");
     //---------------------------------------------------------------------------------------------------
 
     //lightingShader.use();
@@ -506,6 +560,13 @@ int main()
 
         //upload texture of shaders
         glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture4);
+
+        // render the menu
+        drawMenu(menuVAO);
+
+        //upload texture of shaders
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture2);
 
         // render the sky
@@ -554,15 +615,30 @@ void processInput(GLFWwindow *window)
     
     //if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && yMax >= 105) ==> limite eixo y a usar quando jogador estiver bem posicionado
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
+    if (cameraUnlocked == true) {
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            camera.ProcessKeyboard(FORWARD, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            camera.ProcessKeyboard(BACKWARD, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            camera.ProcessKeyboard(LEFT, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            camera.ProcessKeyboard(RIGHT, deltaTime);
 
+        if (camera.Position.y > 0.0f)
+            camera.Position.y = 0.0f;
+
+        if (camera.Position.y < 0.0f)
+            camera.Position.y = 0.0f;
+
+        if (camera.Position.x < -0.50f)
+            camera.Position.x = -0.50f;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
+        camera = glm::vec3(0.0f, 0.0f, 2.0f);
+        cameraUnlocked = true;
+    }
 
     if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
         texture1 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\wall2.jpg");
@@ -575,21 +651,19 @@ void processInput(GLFWwindow *window)
         texture3 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\floor.png");
     }
 
-    if (camera.Position.y > 0.0f)
-        camera.Position.y = 0.0f;
-
-    if (camera.Position.y < 0.0f)
-        camera.Position.y = 0.0f;
-
-    if (camera.Position.x < -0.50f)
-        camera.Position.x = -0.50f;
-
-    
     //teste => para usar depois em colisões
     if (glfwGetKey(window, GLFW_KEY_END) == GLFW_PRESS) {
         std::cout << "Camera X coordinates: " << camera.Position.x;
         std::cout << "Camera Y coordinates: " << camera.Position.y;
-        std::cout << "Camera Z coordinates: " << camera.Position.z << "\n\n"; 
+        std::cout << "Camera Z coordinates: " << camera.Position.z << "\n\n";
+
+        std::cout << "Camera X coordinates: " << camera.Front.x;
+        std::cout << "Camera Y coordinates: " << camera.Front.y;
+        std::cout << "Camera Z coordinates: " << camera.Front.z << "\n\n";
+
+        std::cout << "Camera X coordinates: " << camera.Up.x;
+        std::cout << "Camera Y coordinates: " << camera.Up.y;
+        std::cout << "Camera Z coordinates: " << camera.Up.z << "\n\n";
     }
 
     if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS) {
@@ -654,6 +728,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
     
+    if(cameraUnlocked == true)
     camera.ProcessMouseMovement(xoffset, yoffset);
     //std::cout << "Mouse coordinates: " << xpos << ", " << ypos << std::endl;
 }
