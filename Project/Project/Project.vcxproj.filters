@@ -318,6 +318,9 @@
     <ClInclude Include="include\freetype\ttunpat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\ft2build.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Source\wall.jpg">
