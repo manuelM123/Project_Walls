@@ -154,6 +154,8 @@
     <None Include="Source\fragmentshader.fs" />
     <None Include="Source\freetype.dll" />
     <None Include="Source\FS.fs" />
+    <None Include="Source\SimpleFragmentShader.fs" />
+    <None Include="Source\SimpleVertexShader.vs" />
     <None Include="Source\text.fs" />
     <None Include="Source\text.vs" />
     <None Include="Source\vertexshader.vs" />

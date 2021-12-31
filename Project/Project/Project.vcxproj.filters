@@ -35,6 +35,8 @@
     <None Include="Source\freetype.dll" />
     <None Include="Source\text.fs" />
     <None Include="Source\text.vs" />
+    <None Include="Source\SimpleFragmentShader.fs" />
+    <None Include="Source\SimpleVertexShader.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.h">

@@ -113,6 +113,10 @@ int main()
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
+
+    //to prevent possible stutters
+    glfwWindowHint(GLFW_SAMPLES, 4);
+
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -133,7 +137,7 @@ int main()
     glfwMakeContextCurrent(window);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
-    
+
     // tell GLFW to capture our mouse
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     
@@ -154,9 +158,9 @@ int main()
 
     // C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source
     // C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source
-    Shader lightingShader("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\2.1.basic_lighting.vs", "C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\2.1.basic_lighting.fs");
-    Shader lampShader("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\2.1.lamp.vs", "C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\2.1.lamp.fs");
-    Shader skyShader("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\VS.vs", "C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\FS.fs");
+    Shader lightingShader("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project_Walls\\Project\\Project\\Source\\2.1.basic_lighting.vs", "C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project_Walls\\Project\\Project\\Source\\2.1.basic_lighting.fs");
+    Shader lampShader("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project_Walls\\Project\\Project\\Source\\2.1.lamp.vs", "C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project_Walls\\Project\\Project\\Source\\2.1.lamp.fs");
+    Shader skyShader("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project_Walls\\Project\\Project\\Source\\VS.vs", "C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project_Walls\\Project\\Project\\Source\\FS.fs");
     
 
     //------------------------------
@@ -505,10 +509,10 @@ int main()
     glEnableVertexAttribArray(2);
 
     //unsigned int texture1 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project\\Project\\Source\\awesomeface.png");
-      texture1 = loadTexture("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\wall5.jpeg");
-      texture2 = loadTexture("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\sky.png");
-      texture3 = loadTexture("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\floor.png");
-      texture4 = loadTexture("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\wall4.png");
+      texture1 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project_Walls\\Project\\Project\\Source\\wall5.jpeg");
+      texture2 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project_Walls\\Project\\Project\\Source\\sky.png");
+      texture3 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project_Walls\\Project\\Project\\Source\\floor.png");
+      texture4 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project_Walls\\Project\\Project\\Source\\wall4.png");
     //---------------------------------------------------------------------------------------------------
 
     //lightingShader.use();
@@ -519,10 +523,13 @@ int main()
     // -----------
     while (!glfwWindowShouldClose(window))
     {
+
         for(int i=0; i<2 ; i++)
         {
+
             if (i == 0)
             {
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
                 // per-frame time logic
@@ -538,7 +545,6 @@ int main()
                 // render
                 // ------
                 glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
                 // be sure to activate shader when setting uniforms/drawing objects
                 lightingShader.use();
@@ -597,15 +603,20 @@ int main()
 
                 glBindVertexArray(lightVAO);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
-                glfwSwapBuffers(window);
+                //glfwSwapBuffers(window);
             }
             else
             {
-                drawHUD();
-                glfwSwapBuffers(window);
+                //glClear(GL_COLOR_BUFFER_BIT);
+                if (cameraUnlocked == true) {
+                    glClear(GL_DEPTH_BUFFER_BIT);
+                    drawHUD();
+                }
+                //glfwSwapBuffers(window);
             }
+            
         }
-        
+        glfwSwapBuffers(window);
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwPollEvents();
@@ -638,7 +649,7 @@ void transferDataToGPUMemory(void)
     glBindVertexArray(VertexArrayID);
 
     // Create and compile our GLSL program from the shaders
-    programID = LoadShaders("C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\SimpleVertexShader.vs", "C:\\Users\\manue\\Desktop\\Project_Walls\\Project\\Project\\Source\\SimpleFragmentShader.fs");
+    programID = LoadShaders("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project_Walls\\Project\\Project\\Source\\SimpleVertexShader.vs", "C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project_Walls\\Project\\Project\\Source\\SimpleFragmentShader.fs");
 
     static const GLfloat g_vertex_buffer_data[] = {
         0.0f,  0.0f,  0.0f,
@@ -772,7 +783,7 @@ GLuint LoadShaders(const char* vertex_file_path, const char* fragment_file_path)
 void draw(void)
 {
     // Clear the screen
-    glClear(GL_COLOR_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Use our shader
     glUseProgram(programID);
@@ -879,9 +890,6 @@ void processInput(GLFWwindow *window)
         cont = 0;
     }
 }
-
-
-
 
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
