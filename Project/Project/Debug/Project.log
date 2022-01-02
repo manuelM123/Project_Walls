@@ -4,36 +4,35 @@ C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Pr
 C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(86,20): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
 C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(128,17): warning C4305: 'initializing': truncation from 'double' to 'float'
 C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(663,36): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(768,68): warning C4244: 'argument': conversion from 'double' to 'GLsizei', possible loss of data
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(768,49): warning C4244: 'argument': conversion from 'double' to 'GLsizei', possible loss of data
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(768,30): warning C4244: 'argument': conversion from 'double' to 'GLint', possible loss of data
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(844,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(769,68): warning C4244: 'argument': conversion from 'double' to 'GLsizei', possible loss of data
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(769,49): warning C4244: 'argument': conversion from 'double' to 'GLsizei', possible loss of data
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(769,30): warning C4244: 'argument': conversion from 'double' to 'GLint', possible loss of data
 C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(845,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(849,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(846,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(850,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(852,12): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(854,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(851,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(853,12): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(855,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(866,31): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(867,16): warning C4305: '+=': truncation from 'double' to 'float'
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(925,43): warning C4244: '=': conversion from 'const float' to 'int', possible loss of data
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(927,37): warning C4838: conversion from 'double' to 'int' requires a narrowing conversion
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(927,37): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(931,43): warning C4244: '=': conversion from 'const float' to 'int', possible loss of data
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(939,33): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(856,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(867,31): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(868,16): warning C4305: '+=': truncation from 'double' to 'float'
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(926,43): warning C4244: '=': conversion from 'const float' to 'int', possible loss of data
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(928,37): warning C4838: conversion from 'double' to 'int' requires a narrowing conversion
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(928,37): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(932,43): warning C4244: '=': conversion from 'const float' to 'int', possible loss of data
 C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(940,33): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(941,33): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(942,33): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(952,35): warning C4018: '<=': signed/unsigned mismatch
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(980,41): warning C4838: conversion from 'double' to 'int' requires a narrowing conversion
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(980,41): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(984,48): warning C4244: '=': conversion from 'const float' to 'int', possible loss of data
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(989,38): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(943,33): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(953,35): warning C4018: '<=': signed/unsigned mismatch
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(981,41): warning C4838: conversion from 'double' to 'int' requires a narrowing conversion
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(981,41): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(985,48): warning C4244: '=': conversion from 'const float' to 'int', possible loss of data
 C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(990,38): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(991,38): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(992,38): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(1010,39): warning C4018: '<=': signed/unsigned mismatch
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(1024,51): warning C4018: '<=': signed/unsigned mismatch
-C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(1040,43): warning C4018: '<=': signed/unsigned mismatch
-LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(993,38): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(1011,39): warning C4018: '<=': signed/unsigned mismatch
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(1025,51): warning C4018: '<=': signed/unsigned mismatch
+C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Project\Source\Main.cpp(1041,43): warning C4018: '<=': signed/unsigned mismatch
   Project.vcxproj -> C:\Users\Legion\Desktop\Storage\Uni\3ano\CG\Walls\Project_Walls\Project_Walls\Project\Debug\Project.exe

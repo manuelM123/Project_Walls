@@ -734,6 +734,7 @@ int main()
             }
             else
             {
+                if(cameraUnlocked == true)
                 drawHUD(shader);
                 //glfwSwapBuffers(window);
             }
