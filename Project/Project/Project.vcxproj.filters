@@ -354,6 +354,9 @@
     <Image Include="Source\start.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Source\exit.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Font Include="Source\Arial.ttf" />

@@ -260,6 +260,7 @@
   <ItemGroup>
     <Image Include="Source\awesomeface.png" />
     <Image Include="Source\erva.jpg" />
+    <Image Include="Source\exit.png" />
     <Image Include="Source\floor.png" />
     <Image Include="Source\sky.png" />
     <Image Include="Source\start.png" />

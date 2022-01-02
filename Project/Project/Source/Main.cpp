@@ -63,6 +63,7 @@ float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 bool cameraUnlocked = false;
+bool exitMaze = false;
 
 // timing
 float deltaTime = 0.0f;
@@ -79,6 +80,7 @@ float zstep = 0.01f;
 glm::vec3 PositionBefore = camera.Position;
 
 int POINTS = 0;
+float XExitV2 = 0.00f;
 
 //variavel controlo
 int cont = 0;
@@ -641,7 +643,7 @@ int main()
     texture1 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project_Walls\\Project\\Project\\Source\\wall5.jpeg");
     texture2 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project_Walls\\Project\\Project\\Source\\sky.png");
     texture3 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project_Walls\\Project\\Project\\Source\\floor.png");
-    texture4 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project_Walls\\Project\\Project\\Source\\wall4.png");
+    texture4 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project_Walls\\Project\\Project\\Source\\start.png");
     //---------------------------------------------------------------------------------------------------
 
     //lightingShader.use();
@@ -698,6 +700,24 @@ int main()
 
                 //drawing maze
                 goMaze(cubeVAO, lightingShader, model, floorVAO, skyShader, pointVAO);
+
+                if (camera.Position.x > XExitV2 && XExitV2 != 0.00f && cameraUnlocked == true) {
+                    camera.Position.x = 65.691f;
+                    camera.Position.y = 1.85396f;
+                    camera.Position.z = -0.159782f;
+
+                    camera.Front.x = -0.999985f;
+                    camera.Front.y = 0.00174533f;
+                    camera.Front.z = 0.00523764f;
+
+                    camera.Up.x = 0.0017453f;
+                    camera.Up.y = 0.999998f;
+                    camera.Up.z = -9.1414e-06f;
+
+                    texture4 = loadTexture("C:\\Users\\Legion\\Desktop\\Storage\\Uni\\3ano\\CG\\Walls\\Project_Walls\\Project_Walls\\Project\\Project\\Source\\exit.png");
+                    cameraUnlocked = false;
+                    exitMaze = true;
+                }
 
                 //activate sky shader
                 skyShader.use();
@@ -801,8 +821,10 @@ void processInput(GLFWwindow* window)
     }
 
     if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
-        camera = glm::vec3(0.0f, 0.0f, 2.0f);
-        cameraUnlocked = true;
+        if (exitMaze == false) {
+            camera = glm::vec3(0.0f, 0.0f, 2.0f);
+            cameraUnlocked = true;
+        }
     }
 
     if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
@@ -879,13 +901,13 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
     int j;
 
     int maze[8][6] = {
-        {1,1,0,0,1,1},
+        {1,1,1,0,1,1},
+        {1,1,0,0,0,1},
+        {1,0,0,1,0,1},
         {1,0,1,0,0,1},
         {1,0,0,1,0,1},
-        {1,0,0,0,0,1},
         {1,1,0,1,0,1},
-        {1,1,1,1,0,1},
-        {1,0,0,0,0,1},
+        {1,0,0,0,1,1},
         {1,0,1,1,1,1},
     };
 
@@ -899,6 +921,7 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
         for (j = 5; j >= 0; j--) {
             model = resetModel(initial_model);
             pos = 5 - j;
+
             if (maze[i][j] == 1) {  // Means there is a cube 
                 model = glm::translate(model, glm::vec3(i, 0, pos));
                 //Light.setMat4("model", model);
@@ -992,6 +1015,9 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
                     float zPositive2 = pos14V2 + 0.20;
                     float zNegative2 = pos14V2 - 0.20;
 
+                    if(i == 7)
+                     XExitV2 = pos12V2 + 0.62;
+
                     arrLimits2.insert(arrLimits2.end(), { xPositive2,xNegative2,zPositive2,zNegative2 });
 
                     float x = 0.00f;
@@ -1042,7 +1068,7 @@ void goMaze(unsigned int cubeVAO, Shader Light, glm::mat4 model, unsigned int fl
                             if (xPositive2 == alreadyThere[t] && xNegative2 == alreadyThere[t + 1] && zPositive2 == alreadyThere[t + 2] && zNegative2 == alreadyThere[t + 3]) {
                                 showPoint = false;
                                 //if (cont == 0) {
-                                std::cout << POINTS << "\n";
+                                //std::cout << POINTS << "\n";
                                 cont = 1;
                                 //}
                                 break;
