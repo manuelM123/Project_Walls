@@ -1,5 +1,5 @@
 # Wall Labyrinth game done in C++ programming language with Visual Studio
-This game has been elaborated for the discipline of Computer Graphics
+This game has been elaborated for the discipline of Computer Graphics.
 
 It's functionalities are divided in:
 
